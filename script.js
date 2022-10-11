@@ -9,15 +9,153 @@ const IMG_URL = `https://image.tmdb.org/t/p/w500`;
 
 const searchURL = Base_URL + `/search/movie?` + API_KEY
 
+const genres = [
+  {
+    "id": 28,
+    "name": "Action"
+  },
+  {
+    "id": 12,
+    "name": "Adventure"
+  },
+  {
+    "id": 16,
+    "name": "Animation"
+  },
+  {
+    "id": 35,
+    "name": "Comedy"
+  },
+  {
+    "id": 80,
+    "name": "Crime"
+  },
+  {
+    "id": 99,
+    "name": "Documentary"
+  },
+  {
+    "id": 18,
+    "name": "Drama"
+  },
+  {
+    "id": 10751,
+    "name": "Family"
+  },
+  {
+    "id": 14,
+    "name": "Fantasy"
+  },
+  {
+    "id": 36,
+    "name": "History"
+  },
+  {
+    "id": 27,
+    "name": "Horror"
+  },
+  {
+    "id": 10402,
+    "name": "Music"
+  },
+  {
+    "id": 9648,
+    "name": "Mystery"
+  },
+  {
+    "id": 10749,
+    "name": "Romance"
+  },
+  {
+    "id": 878,
+    "name": "Science Fiction"
+  },
+  {
+    "id": 10770,
+    "name": "TV Movie"
+  },
+  {
+    "id": 53,
+    "name": "Thriller"
+  },
+  {
+    "id": 10752,
+    "name": "War"
+  },
+  {
+    "id": 37,
+    "name": "Western"
+  }
+]
+
 const main = document.getElementById("main");
 const form = document.getElementById("form");
 const search = document.getElementById("search");
+const tags = document.getElementById('tags')
+
+let selectedGenre = []
+
+// immediately load when page load
+setGenere()
+function setGenere(){
+  tags.innerHTML = ''
+
+  genres.forEach(genre => {
+    const t = document.createElement('div')
+    t.classList.add('tag')
+    t.id = genre.id
+    t.innerText = genre.name
+
+    t.addEventListener('click', () => {
+      if(selectedGenre.length == 0){
+        selectedGenre.push(genre.id)
+      }
+      else{
+        if(selectedGenre.includes(genre.id)){
+          selectedGenre.forEach((id, idx) => {
+            if(id = genre.id){
+              selectedGenre.splice(idx, 1)
+            }
+          })
+        }
+        else{
+          selectedGenre.push(genre.id)
+        }
+      }
+
+      getMovies(API_URL + `&with_genres=` + encodeURI(selectedGenre.join(',')))
+      highLightSelection()
+    })
+    tags.append(t)
+  })
+}
+
+
+function highLightSelection() {
+  const allTags = document.querySelectorAll('.tag')
+  allTags.forEach(tag => {
+    tag.classList.remove('highlight')
+  })
+  if(selectedGenre.length != 0){
+    selectedGenre.forEach(id => {
+      const highLightedTag = document.getElementById(id)
+      highLightedTag.classList.add('highlight')
+    })
+  }
+}
+
+
 
 function getMovies(url) {
   fetch(url)
     .then((res) => res.json())
     .then((data) => {
-      showMovies(data.results);
+      if(data.results.length != 0){
+        showMovies(data.results);
+      }
+      else{
+        main.innerHTML = `<h1 class='error'>No Results Found...</h1>`
+      }
     });
 }
 
@@ -32,7 +170,7 @@ function showMovies(data) {
     const movieEle = document.createElement("div");
     movieEle.classList.add("movie");
     movieEle.innerHTML = `
-    <img src="${IMG_URL + poster_path}" alt="${title}">
+    <img src="${poster_path ? IMG_URL + poster_path : 'https://via.placeholder.com/1080x1580'}" alt="${title}">
 
     <div class="movie-info">
       <h3>${title}</h3>

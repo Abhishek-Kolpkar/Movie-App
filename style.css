@@ -47,6 +47,33 @@ header{
   color: #7378c5;
 }
 
+#tags{
+  width: 80%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  margin: 10px auto;
+}
+
+.tag{
+  color: #fff;
+  padding: 10px 20px;
+  background: orange;
+  border-radius: 50px;
+  margin: 5px;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.tag.highlight{
+  background: red;
+}
+
+.error{
+  color: #fff;
+}
+
 
 /* --------------- main CSS --------------- */
 main{

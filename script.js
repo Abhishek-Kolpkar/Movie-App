@@ -136,6 +136,7 @@ function highLightSelection() {
   allTags.forEach(tag => {
     tag.classList.remove('highlight')
   })
+  clearBtn()
   if(selectedGenre.length != 0){
     selectedGenre.forEach(id => {
       const highLightedTag = document.getElementById(id)
@@ -144,7 +145,29 @@ function highLightSelection() {
   }
 }
 
+function clearBtn() {
+  let clearBtn = document.getElementById('clear')
+  if(clearBtn) {
+    clearBtn.classList.add('highlight')
+  }
+  else{
+    const clear = document.createElement('div')
+    clear.classList.add('tag', 'highlight')
+    clear.id = 'clear'
+    clear.innerText = 'Clear x'
 
+    clear.addEventListener('click', () => {
+      selectedGenre = []
+      setGenere()
+      getMovies(API_URL);
+    })
+    tags.append(clear)
+  }
+
+}
+
+
+getMovies(API_URL);
 
 function getMovies(url) {
   fetch(url)
@@ -159,7 +182,7 @@ function getMovies(url) {
     });
 }
 
-getMovies(API_URL);
+
 
 function showMovies(data) {
   main.innerHTML = "";
@@ -203,6 +226,8 @@ form.addEventListener('submit', (e) => {
   e.preventDefault()
 
   const searchTerm = search.value
+  selectedGenre = []
+  setGenere()
 
   if(searchTerm){
     getMovies(searchURL + `&query=` + searchTerm)

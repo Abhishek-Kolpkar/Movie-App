@@ -93,6 +93,17 @@ const form = document.getElementById("form");
 const search = document.getElementById("search");
 const tags = document.getElementById('tags')
 
+/* ----------------- pagination ----------------- */
+const prev = document.getElementById('prev')
+const next = document.getElementById('next')
+const current = document.getElementById('current')
+
+let currentPage = 1
+let nextPage = 2
+let prevPage = 3
+let lastURL = ''
+let totalPages = 100
+
 let selectedGenre = []
 
 // immediately load when page load
@@ -170,11 +181,33 @@ function clearBtn() {
 getMovies(API_URL);
 
 function getMovies(url) {
+  lastURL = url
+
   fetch(url)
     .then((res) => res.json())
     .then((data) => {
       if(data.results.length != 0){
         showMovies(data.results);
+        // for pagination
+        currentPage = data.page
+        nextPage = currentPage + 1
+        prevPage = currentPage - 1
+        totalPages = data.total_pages
+
+        current.innerText = currentPage
+        if(currentPage <= 1){
+          prev.classList.add('disabled')
+          next.classList.remove('disabled')
+        }
+        else if(currentPage >= totalPages){
+          prev.classList.remove('disabled')
+          next.classList.add('disabled')
+        }
+        else{
+          prev.classList.remove('disabled')
+          next.classList.remove('disabled')
+        }
+        tags.scrollIntoView({behavior : 'smooth'})
       }
       else{
         main.innerHTML = `<h1 class='error'>No Results Found...</h1>`
@@ -236,3 +269,37 @@ form.addEventListener('submit', (e) => {
     getMovies(API_URL)
   }
 })
+
+
+/* ----------------- pagination ----------------- */
+prev.addEventListener('click', () => {
+  if(prevPage > 0){
+    pageCall(prevPage)
+  }
+})
+
+next.addEventListener('click', () => {
+  if(nextPage <= totalPages){
+    pageCall(nextPage)
+  }
+})
+
+function pageCall(page){
+  let urlSpilt = lastURL.split('?')
+  let queryParam = urlSpilt[1].split('&')
+  let key = queryParam[queryParam.length - 1].split('=')
+
+  if(key[0] != 'page'){
+    let url = lastURL + '&page=' + page
+    getMovies(url)
+  }
+  else{
+    key[1] = page.toString()
+    let a = key.join('=')
+    queryParam[queryParam.length - 1] = a
+
+    let b = queryParam.join('&')
+    let url = urlSpilt[0] + '?' + b
+    getMovies(url)
+  }
+}
